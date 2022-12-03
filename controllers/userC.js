@@ -46,7 +46,7 @@ const createUser = async (req, res) => {
       from: process.env.EMAIL,
       to: userMail,
       subject:"Thank you for creating an account on our website " +savedUserData.fname,
-      text: "We dont provide any services on our website. But thank you for creating an account",
+      text: "We hope you have a good time with our app.",
     });
 
     let pswd = await UserSchema.findById({ _id: id }).select("-password -profilePic"); //to hide hashed pswd
