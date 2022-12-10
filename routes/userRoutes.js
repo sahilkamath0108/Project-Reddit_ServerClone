@@ -30,7 +30,7 @@ router.delete("/delete", auth.authToken ,userC.deleteUser)
 
 //updating user info
 
-router.put("/update/:uname", auth.authToken ,userC.updateUser)
+router.put("/update", auth.authToken ,userC.updateUser)
 
 //forgot password
 
