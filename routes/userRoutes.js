@@ -1,4 +1,5 @@
 const express = require("express")
+const { verify } = require("jsonwebtoken")
 
 const userC = require("../controllers/userC")
 const auth = require("../middleware/auth")
@@ -35,5 +36,12 @@ router.put("/update/:uname", auth.authToken ,userC.updateUser)
 
 router.post("/forgotPassword", userC.forgotPswd)
 
+//get otp
+
+router.post("/getOTP", userC.loginOTP)
+
+//login via OTP
+
+router.post("/loginOTP", auth.verifyOTP ,userC.verifyOTP)
 
 module.exports = router

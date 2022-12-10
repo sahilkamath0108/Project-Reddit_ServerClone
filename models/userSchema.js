@@ -64,6 +64,9 @@ const userSchema = new Schema({
     postCount: {
         type: Number,
         default: 0
+    },
+    OTP: {
+        type: Number,
     }
 
 }, {timestamps: true});
