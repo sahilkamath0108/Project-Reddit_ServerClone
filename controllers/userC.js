@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const { authToken } = require("../middleware/auth");
 const auth = require("../middleware/auth");
 const nodemailer = require("nodemailer");
+const otpGenerator = require("otp-generator")
 
 let mailTransporter = nodemailer.createTransport({
   service: "gmail",
@@ -227,11 +228,54 @@ const forgotPswd = async (req, res) => {
     to: userMail,
     subject: "Here is your password " + user.fname,
     text:
-      "Kindly enter the following token to get access to your account: " + r,
+      "Kindly enter the following password to get access to your account: " + r,
   });
 
   res.send("Email has been sent to registered email ID");
 };
+
+// login using otp
+
+const otp = otpGenerator.generate(6, { lowerCaseAlphabets: false,upperCaseAlphabets: false, specialChars: false });
+
+const loginOTP = async (req,res) => {
+  const username = req.body.username
+  const user = await UserSchema.findOne({username: username})
+
+  if(!user){
+    res.status(404).json({
+      success: false,
+      message: "User not found"
+    })
+  }
+  const OTP = otp
+  const userWithOtp = await UserSchema.findOneAndUpdate({username: username}, {OTP: OTP})
+
+  const userMail = user.email;
+
+  mailTransporter.sendMail({
+    from: process.env.EMAIL,
+    to: userMail,
+    subject: "Here is your OTP " + user.fname,
+    text:
+      "Kindly enter the following password to get access to your account: " + OTP,
+  });
+
+  res.send("Email with the OTP has been sent to registered email ID");
+
+}
+
+const verifyOTP = async (req,res) =>{
+  const username = req.user.username
+  const deleteOTP = await UserSchema.findOneAndUpdate({username: username}, { $set :{OTP: null}})
+  const user = await UserSchema.findOne({ username: username }).select("-password -profilePic")
+  const token = await user.genAuthToken()
+  res.json({
+    success: true,
+    token: token,
+    user: user
+  })
+}
 
 module.exports = {
   deleteUser,
@@ -241,4 +285,6 @@ module.exports = {
   loginUser,
   uploadPfp,
   forgotPswd,
+  loginOTP,
+  verifyOTP
 };

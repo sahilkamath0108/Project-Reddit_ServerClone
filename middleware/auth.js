@@ -72,10 +72,34 @@ const fileVerifyPost = multer({
     }
 })
 
+const verifyOTP = async(req,res,next) =>{
+    const otpEntered = req.body.otp
+    const username = req.body.username
+    const user = await UserSchema.findOne({username: username})
+
+    if(!user){
+        res.status(404).json({
+            success: false,
+            message: "User not found."
+        })
+    }
+
+    if(otpEntered===(user.OTP)){
+        req.user = user
+        next()
+    }else{
+        res.status(403).json({
+            success: false,
+            message: "Wrong OTP entered, check again."
+        })
+    }
+}
+
 
 module.exports = {
     authToken,
     authorizePost,
     fileVerifyPfp,
-    fileVerifyPost
+    fileVerifyPost,
+    verifyOTP
 }
