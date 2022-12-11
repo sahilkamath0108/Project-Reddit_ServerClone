@@ -1,5 +1,4 @@
 const express = require("express")
-const { verify } = require("jsonwebtoken")
 
 const userC = require("../controllers/userC")
 const auth = require("../middleware/auth")

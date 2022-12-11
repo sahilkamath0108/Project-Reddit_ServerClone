@@ -2,9 +2,6 @@ require("dotenv").config();
 const UserSchema = require("../models/userSchema");
 const PostSchema = require("../models/postSchema");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const { authToken } = require("../middleware/auth");
-const auth = require("../middleware/auth");
 const nodemailer = require("nodemailer");
 const otpGenerator = require("otp-generator")
 
@@ -173,9 +170,7 @@ const loginUser = async (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
   const user = await UserSchema.findOne({ username: username });
-  const withoutPswd = await UserSchema.findOne({ username: username }).select(
-    "-password -profilePic"
-  );
+  const withoutPswd = await UserSchema.findOne({ username: username }).select("-password -profilePic");
 
   if (!user) {
     return res.status(400).send({ error: "User does not exist..." });

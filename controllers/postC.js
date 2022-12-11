@@ -141,27 +141,42 @@ const likePost = async (req,res) => {
   const id = req.params.id;
   const post = await PostSchema.findById({_id: id});
 
-
   if(!post){
     res.status(404).json({
       success: false,
       message: "Post does not exist"
     })
-  }else{
-    try{
-    await PostSchema.findByIdAndUpdate({_id : id}, { $inc: {likes : 1}});
-    const updated = await PostSchema.findById({_id: id});
+  }
+
+  const username = req.user.username
+  const cond = post.likedBy.includes(username)
+  
+  if(cond){
+    await PostSchema.findOneAndUpdate({_id: id}, {$pull : {likedBy: username}})
+    const remove = await PostSchema.findOneAndUpdate({_id: id}, {$inc: {likes: -1}})
     res.json({
       success: true,
-      data: updated
+      message: "Unliked the post"
     })
-  }catch(e){
-    res.json({
-      success: false,
-      message: e.message
-    })
+  }else{
+      try{
+      await PostSchema.findByIdAndUpdate({_id : id}, { $inc: {likes : 1}});
+      await PostSchema.findByIdAndUpdate({_id : id}, { $push: {likedBy : username}});
+      const updated = await PostSchema.findById({_id: id});
+      res.json({
+        success: true,
+        data: updated
+      })
+    }catch(e){
+      res.json({
+        success: false,
+        message: e.message
+      })
+    }
   }
-}
+
+
+  
 }
 
 
