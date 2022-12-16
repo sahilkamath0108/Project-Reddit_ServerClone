@@ -39,4 +39,8 @@ router1.post("/dislike/:id", auth.authToken , postC.dislikePost);
 
 router1.post("/comment/:id", auth.authToken , postC.commentPost);
 
+//delete a comment
+
+router1.post("/comment/:postID/:commentID", auth.authToken, postC.deleteComment);
+
 module.exports= router1 

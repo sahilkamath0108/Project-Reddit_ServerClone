@@ -2,6 +2,7 @@ const UserSchema = require("../models/userSchema");
 const PostSchema = require("../models/postSchema");
 const userC = require("./userC");
 const { post } = require("../routes/postRoutes");
+const { $where } = require("../models/postSchema");
 
 //my posts
 
@@ -224,7 +225,6 @@ const likePost = async (req,res) => {
 }
 
 // comment on a post
-var userCount = -1
 
 const commentPost = async (req,res) => {
   const username = req.user.username
@@ -249,6 +249,38 @@ const commentPost = async (req,res) => {
 
 }
 
+const deleteComment = async (req,res) => {
+  const username = req.user.username
+  const commentID = req.params.commentID
+  const postID = req.params.postID
+
+  
+  // const post = await PostSchema.findByIdAndUpdate({_id: postID})
+  const post = await PostSchema.findOne({ _id: postID})
+  post.comment.forEach(async (comment) => {
+    if(comment._id == commentID){
+      // console.log(post.comment.splice(0,1))
+      // post.
+    const now = await PostSchema.updateOne({_id : postID}, {$pull: { comment : [{"_id":comment}]}})
+    console.log(now)
+    }else{
+      console.log("Not Found")
+    }
+  })
+  if(!post){
+    res.status(404).json({
+      success: false,
+      message: "post not found"
+    })
+  }
+
+  res.json({
+    success: true,
+    message: "Comment succesful"
+  })
+
+}
+
 
 module.exports = {
   allPosts,
@@ -258,5 +290,6 @@ module.exports = {
   likePost,
   myPosts,
   commentPost,
-  dislikePost
+  dislikePost,
+  deleteComment
 }
