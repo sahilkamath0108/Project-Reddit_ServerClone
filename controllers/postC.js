@@ -1,6 +1,7 @@
 const UserSchema = require("../models/userSchema");
 const PostSchema = require("../models/postSchema");
 const userC = require("./userC");
+const { post } = require("../routes/postRoutes");
 
 //my posts
 
@@ -137,7 +138,7 @@ const updatePost = async (req, res) => {
 
 // like a post
 
-const likePost = async (req,res) => {
+const dislikePost = async (req,res) => {
   const id = req.params.id;
   const post = await PostSchema.findById({_id: id});
 
@@ -156,7 +157,8 @@ const likePost = async (req,res) => {
     const remove = await PostSchema.findOneAndUpdate({_id: id}, {$inc: {likes: -1}})
     res.json({
       success: true,
-      message: "Unliked the post"
+      message: "Unliked the post. Keep redditing!",
+      data: remove
     })
   }else{
       try{
@@ -165,6 +167,7 @@ const likePost = async (req,res) => {
       const updated = await PostSchema.findById({_id: id});
       res.json({
         success: true,
+        message: "Liked the post. Keep redditing!",
         data: updated
       })
     }catch(e){
@@ -174,9 +177,76 @@ const likePost = async (req,res) => {
       })
     }
   }
+}
 
+
+// dislike a post
+
+const likePost = async (req,res) => {
+  const id = req.params.id;
+  const post = await PostSchema.findById({_id: id});
+
+  if(!post){
+    res.status(404).json({
+      success: false,
+      message: "Post does not exist"
+    })
+  }
+
+  const username = req.user.username
+  const cond = post.dislikedBy.includes(username)
+  
+  if(cond){
+    await PostSchema.findOneAndUpdate({_id: id}, {$pull : {dislikedBy: username}})
+    const remove = await PostSchema.findOneAndUpdate({_id: id}, {$inc: {dislikes: 1}})
+    res.json({
+      success: true,
+      message: "Un-disliked the post",
+      data: remove
+    })
+  }else{
+      try{
+      await PostSchema.findByIdAndUpdate({_id : id}, { $inc: {dislikes : -1}});
+      await PostSchema.findByIdAndUpdate({_id : id}, { $push: {dislikedBy : username}});
+      const updated = await PostSchema.findById({_id: id});
+      res.json({
+        success: true,
+        message: "Disliked the post",
+        data: updated
+      })
+    }catch(e){
+      res.json({
+        success: false,
+        message: e.message
+      })
+    }
+  }
+}
+
+// comment on a post
+var userCount = -1
+
+const commentPost = async (req,res) => {
+  const username = req.user.username
+  const comment = req.body.comment
+  const postID = req.params.id
 
   
+  // const post = await PostSchema.findByIdAndUpdate({_id: postID})
+  const post = await PostSchema.findByIdAndUpdate({ _id: postID} , {$push : {comment : [ {"commentBy": username, "comments": comment}]}})
+
+  if(!post){
+    res.status(404).json({
+      success: false,
+      message: "post not found"
+    })
+  }
+
+  res.json({
+    success: true,
+    message: "Comment succesful"
+  })
+
 }
 
 
@@ -186,5 +256,7 @@ module.exports = {
   deletePost,
   updatePost,
   likePost,
-  myPosts
+  myPosts,
+  commentPost,
+  dislikePost
 }

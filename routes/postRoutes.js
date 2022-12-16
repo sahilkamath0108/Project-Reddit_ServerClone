@@ -37,6 +37,6 @@ router1.post("/dislike/:id", auth.authToken , postC.dislikePost);
 
 //comment on a post
 
-router1.post("/comment/:id", auth.authToken , postC.commentPost)
+router1.post("/comment/:id", auth.authToken , postC.commentPost);
 
 module.exports= router1 
