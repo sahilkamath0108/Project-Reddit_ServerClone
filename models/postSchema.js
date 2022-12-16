@@ -29,18 +29,15 @@ const postSchema = new Schema({
     fileCount: {
         type: Number,
         default: 0
-    }
-    // comments: [{
-    //     type: String
-    // }],
-    // commentedBy: [{
-    //     user : [{
-    //         type: String
-    //     }],
-    //     comment : [{
-    //         type: String
-    //     }]
-    // }]
+    },
+    comment: [{
+        commentBy : {
+            type: String
+        },
+        comments : {
+            type: String
+        }
+    }]
 }, {timestamps: true});
 
 const PostSchema = mongoose.model("post", postSchema);
