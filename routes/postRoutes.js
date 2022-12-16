@@ -31,6 +31,10 @@ router1.put("/update/:id", auth.authToken, auth.authorizePost ,postC.updatePost)
 
 router1.post("/like/:id", auth.authToken , postC.likePost);
 
+//Dislike a post
+
+router1.post("/dislike/:id", auth.authToken , postC.dislikePost);
+
 //comment on a post
 
 router1.post("/comment/:id", auth.authToken , postC.commentPost)

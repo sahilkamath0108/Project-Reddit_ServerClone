@@ -23,6 +23,13 @@ const postSchema = new Schema({
     likedBy: [{
         type: String
     }],
+    dislikes: {
+        type: Number,
+        default: 0
+    },
+    dislikedBy: [{
+        type: String
+    }],
     files: [{
         type: Buffer
     }],
