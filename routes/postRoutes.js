@@ -31,4 +31,8 @@ router1.put("/update/:id", auth.authToken, auth.authorizePost ,postC.updatePost)
 
 router1.post("/like/:id", auth.authToken , postC.likePost);
 
-module.exports= router1;
+//comment on a post
+
+router1.post("/comment/:id", auth.authToken , postC.commentPost)
+
+module.exports= router1 
