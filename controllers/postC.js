@@ -139,7 +139,7 @@ const updatePost = async (req, res) => {
 
 // like a post
 
-const dislikePost = async (req,res) => {
+const likePost = async (req,res) => {
   const id = req.params.id;
   const post = await PostSchema.findById({_id: id});
 
@@ -163,6 +163,13 @@ const dislikePost = async (req,res) => {
     })
   }else{
       try{
+      const alreadyDisliked = post.dislikedBy.includes(username)
+
+      if(alreadyDisliked){
+        await PostSchema.findByIdAndUpdate({_id: id}, {$pull : {dislikedBy : username}})
+        await PostSchema.findOneAndUpdate({_id: id}, {$inc: {dislikes: -1}})
+      }
+
       await PostSchema.findByIdAndUpdate({_id : id}, { $inc: {likes : 1}});
       await PostSchema.findByIdAndUpdate({_id : id}, { $push: {likedBy : username}});
       const updated = await PostSchema.findById({_id: id});
@@ -183,7 +190,7 @@ const dislikePost = async (req,res) => {
 
 // dislike a post
 
-const likePost = async (req,res) => {
+const dislikePost = async (req,res) => {
   const id = req.params.id;
   const post = await PostSchema.findById({_id: id});
 
@@ -199,7 +206,7 @@ const likePost = async (req,res) => {
   
   if(cond){
     await PostSchema.findOneAndUpdate({_id: id}, {$pull : {dislikedBy: username}})
-    const remove = await PostSchema.findOneAndUpdate({_id: id}, {$inc: {dislikes: 1}})
+    const remove = await PostSchema.findOneAndUpdate({_id: id}, {$inc: {dislikes: -1}})
     res.json({
       success: true,
       message: "Un-disliked the post",
@@ -207,7 +214,13 @@ const likePost = async (req,res) => {
     })
   }else{
       try{
-      await PostSchema.findByIdAndUpdate({_id : id}, { $inc: {dislikes : -1}});
+      const alreadyLiked = post.likedBy.includes(username)
+
+      if(alreadyLiked){
+        await PostSchema.findByIdAndUpdate({_id: id}, {$pull : {likedBy : username}})
+        await PostSchema.findOneAndUpdate({_id: id}, {$inc: {likes: -1}})
+      }
+      await PostSchema.findByIdAndUpdate({_id : id}, { $inc: {dislikes : 1}});
       await PostSchema.findByIdAndUpdate({_id : id}, { $push: {dislikedBy : username}});
       const updated = await PostSchema.findById({_id: id});
       res.json({
@@ -263,7 +276,7 @@ const deleteComment = async (req,res) => {
       message: "post not found"
     })
   }
-  
+
   post.comment.forEach(async (comment) => {
 
     if(comment._id == commentID){
