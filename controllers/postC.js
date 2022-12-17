@@ -255,30 +255,28 @@ const deleteComment = async (req,res) => {
   const postID = req.params.postID
 
   
-  // const post = await PostSchema.findByIdAndUpdate({_id: postID})
   const post = await PostSchema.findOne({ _id: postID})
-  post.comment.forEach(async (comment) => {
-    if(comment._id == commentID){
-      // console.log(post.comment.splice(0,1))
-      // post.
-    const now = await PostSchema.updateOne({_id : postID}, {$pull: { comment : [{"_id":comment}]}})
-    console.log(now)
-    }else{
-      console.log("Not Found")
-    }
-  })
+
   if(!post){
     res.status(404).json({
       success: false,
       message: "post not found"
     })
   }
+  
+  post.comment.forEach(async (comment) => {
 
-  res.json({
-    success: true,
-    message: "Comment succesful"
+    if(comment._id == commentID){
+    const now = await PostSchema.updateOne({_id : postID}, {$pull: { "comment" : {"_id":comment._id}}})
+    res.json({
+      success: true,
+      message: "Comment succesful",
+      data: now
+    })
+    }else{
+      console.log("Not Found")
+    }
   })
-
 }
 
 
