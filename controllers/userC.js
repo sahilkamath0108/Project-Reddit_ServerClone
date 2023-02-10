@@ -3,7 +3,8 @@ const UserSchema = require("../models/userSchema");
 const PostSchema = require("../models/postSchema");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
-const otpGenerator = require("otp-generator")
+const otpGenerator = require("otp-generator");
+const { deleteMany, updateMany } = require("../models/userSchema");
 
 let mailTransporter = nodemailer.createTransport({
   service: "gmail",
@@ -98,6 +99,7 @@ const deleteUser = async (req, res) => {
       });
     } else {
       await PostSchema.deleteMany({ username: user.username });
+      await PostSchema.updateMany({$pullAll: [{ "comment" : {"commentBy":user.username}}]})
 
       mailTransporter.sendMail({
         from: process.env.EMAIL,
@@ -223,7 +225,7 @@ const forgotPswd = async (req, res) => {
     to: userMail,
     subject: "Here is your password " + user.fname,
     text:
-      "Kindly enter the following password to get access to your account: " + r,
+      "Kindly enter the following password to get access to your account: " + r +" and change it after logging in your account.",
   });
 
   res.send("Email has been sent to registered email ID");

@@ -19,7 +19,7 @@ app.use('/user',userRoutes);
 // Post
 app.use('/post',postRoutes);
 
-app.listen(3000 , ()=>{
+app.listen(3000 || process.env.PORT, ()=>{
   console.log('The server is up and running at port 3000');
 });
 

@@ -1,8 +1,6 @@
 const UserSchema = require("../models/userSchema");
 const PostSchema = require("../models/postSchema");
 const userC = require("./userC");
-const { post } = require("../routes/postRoutes");
-const { $where } = require("../models/postSchema");
 
 //my posts
 
@@ -57,11 +55,6 @@ const newPost = async (req, res) => {
       arrOfPosts[i]= buffer[i].buffer;
       fileCount++;
     }
-    // for(var i = 0; i<buffer.length; i++){
-    //   console.log(arrOfPosts[i])
-    // }
-    // console.log(fileCount);
-
     
     await PostSchema.findByIdAndUpdate({_id: post._id},{username: username, files: arrOfPosts, fileCount: fileCount})
     let postUsername = await PostSchema.findById({ _id: post._id }).select('-files')
