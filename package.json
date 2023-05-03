@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@socket.io/admin-ui": "^0.5.1",
+    "@vonage/server-sdk": "^3.2.0",
     "bcryptjs": "^2.4.3",
     "body": "^5.1.0",
     "body-parser": "^1.20.1",
